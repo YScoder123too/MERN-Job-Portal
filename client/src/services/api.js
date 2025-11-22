@@ -1,7 +1,8 @@
 import axios from "axios";
 
-// ⚠️ HARDCODED FIX: We are forcing it to use Render.
-const API_URL = "https://careerkarma.onrender.com";
+// ⚠️ NUCLEAR FIX: We are HARDCODING the Render URL.
+// This removes any chance of Vercel failing to read the variable.
+const API_URL = "https://careerkarma.onrender.com"; 
 
 const api = axios.create({
   baseURL: `${API_URL}/api`, 
