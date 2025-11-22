@@ -21,7 +21,6 @@ const Applications = () => {
     return { headers: { Authorization: `Bearer ${token}` }, withCredentials: true };
   };
 
-  
   const fetchApplications = async () => {
     try {
       const res = await axios.get(`${BACKEND_URL}/api/applications/hr`, getAuthConfig());
@@ -37,27 +36,25 @@ const Applications = () => {
     fetchApplications();
   }, []);
 
-const handleStatusUpdate = async (id, newStatus) => {
+  const handleStatusUpdate = async (id, newStatus) => {
     try {
       await axios.put(`${BACKEND_URL}/api/applications/${id}`, { status: newStatus }, getAuthConfig());
-      
-      
       setApplications(prev => prev.map(app => 
         app._id === id ? { ...app, status: newStatus } : app
       ));
-      
-      
-      setSelectedCandidate(null); 
-      alert(`Candidate marked as ${newStatus}`);
-      
+      if (selectedCandidate && selectedCandidate._id === id) {
+        setSelectedCandidate(prev => ({ ...prev, status: newStatus }));
+      }
     } catch (err) {
       alert("Failed to update status");
     }
   };
 
   const getResumeUrl = (filename) => {
-    if (!filename) return "#";
+    if (!filename || filename === "undefined" || filename === "null") return "#";
+    
     if (filename.startsWith("http")) return filename;
+    
     const cleanName = filename.split(/[/\\]/).pop(); 
     return `${BACKEND_URL}/api/jobs/resume/${cleanName}`;
   };
@@ -95,7 +92,7 @@ const handleStatusUpdate = async (id, newStatus) => {
       {loading ? <div className="text-center py-10 text-gray-500">Loading Applications...</div> : (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredApplications.length === 0 ? (
-             <div className="col-span-full text-center text-gray-500 mt-10">No applications found. (Try applying as a student first!)</div>
+             <div className="col-span-full text-center text-gray-500 mt-10">No applications found.</div>
           ) : filteredApplications.map((app) => (
             <div key={app._id} className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition relative">
               <div className="flex justify-between items-start">
@@ -136,9 +133,15 @@ const handleStatusUpdate = async (id, newStatus) => {
                 <div className="space-y-2 text-sm text-gray-600">
                      <p><strong>Email:</strong> {selectedCandidate.applicant?.email}</p>
                      <p><strong>Job:</strong> {selectedCandidate.job?.title}</p>
-                     <p><strong>Applied:</strong> {new Date(selectedCandidate.createdAt).toDateString()}</p>
                      <div className="bg-gray-50 p-3 rounded border mt-3"><strong className="block mb-1">Cover Letter:</strong><p className="italic">"{selectedCandidate.coverLetter || "No cover letter."}"</p></div>
-                     {selectedCandidate.resume && (<div className="mt-3"><strong>Resume:</strong><a href={getResumeUrl(selectedCandidate.resume)} target="_blank" rel="noreferrer" className="text-indigo-600 underline ml-2 font-medium inline-flex items-center gap-1"><Download size={14} /> Download</a></div>)}
+                     
+                     {/* CHECK FOR RESUME VALIDITY */}
+                     {selectedCandidate.resume && selectedCandidate.resume !== "undefined" && (
+                         <div className="mt-3">
+                             <strong>Resume:</strong>
+                             <a href={getResumeUrl(selectedCandidate.resume)} target="_blank" rel="noreferrer" className="text-indigo-600 underline ml-2 font-medium inline-flex items-center gap-1"><Download size={14} /> Download</a>
+                         </div>
+                     )}
                 </div>
                 <div className="mt-6 flex gap-3">
                     <button onClick={() => handleStatusUpdate(selectedCandidate._id, "Accepted")} className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700">Accept Candidate</button>
