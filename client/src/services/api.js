@@ -31,18 +31,19 @@
 // export default api;
 import axios from "axios";
 
-// CRITICAL FIX: Use the Environment Variable
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+// ⚠️ HARDCODED URL FIX: Replace this string with your exact Render Backend URL
+// Make sure there is NO slash at the end!
+const API_URL = "https://careerkarma.onrender.com"; 
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`, // Ensure /api is appended if your backend routes start with it
-  withCredentials: true,     // Important for cookies/sessions
+  baseURL: `${API_URL}/api`, 
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Add a request interceptor to attach the token automatically
+// Attach Token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -56,7 +57,7 @@ api.interceptors.request.use(
 
 export default api;
 
-// Helper function for setting auth (used in Login.jsx)
+// Helper for Login
 export const setAuth = (token) => {
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
