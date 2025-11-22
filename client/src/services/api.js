@@ -4,6 +4,8 @@ import axios from "axios";
 // This removes any chance of Vercel failing to read the variable.
 const API_URL = "https://careerkarma.onrender.com"; 
 
+console.log("🚀 LIVE CONNECTION ACTIVE: Using Backend at", API_URL);
+
 const api = axios.create({
   baseURL: `${API_URL}/api`, 
   withCredentials: true,
