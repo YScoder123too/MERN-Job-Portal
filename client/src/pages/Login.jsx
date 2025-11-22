@@ -12,6 +12,16 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleForgotPassword = () => {
+    const email = prompt("Please enter your registered email address:");
+    if (email) {
+        alert("Processing...");
+        setTimeout(() => {
+            alert(`✅ Password reset instructions have been sent to ${email}.\n\n`);
+        }, 1500);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -34,9 +44,9 @@ export default function Login() {
       // 3. Save Role (Legacy support)
       localStorage.setItem("role", res.data.user.role);
 
-      // 4. CRITICAL FIX: Save Full User Info for Navbar
+      // 4. Save Full User Info for Navbar
       const userInfo = {
-        id: res.data.user.id || res.data.user._id, // Handle both ID formats
+        id: res.data.user.id || res.data.user._id,
         name: res.data.user.name,
         email: res.data.user.email,
         role: res.data.user.role
@@ -45,9 +55,9 @@ export default function Login() {
 
       // 5. Navigate based on role
       if (res.data.user.role === "recruiter") {
-        navigate("/hr-dashboard/job-management"); // Go straight to jobs
+        navigate("/hr-dashboard/job-management");
       } else {
-        navigate("/jobs"); // Go straight to jobs
+        navigate("/jobs");
       }
     } catch (err) {
       console.error(err.response?.data || err.message);
@@ -59,6 +69,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen">
+      {/* Left Side - Welcome Message */}
       <div className="hidden md:flex w-1/2 bg-gray-100 items-center justify-center p-10">
         <h1 className="text-4xl font-bold text-gray-800 leading-relaxed text-center">
           👋 Hello Friend, <br /> Welcome to{" "}
@@ -67,6 +78,7 @@ export default function Login() {
         </h1>
       </div>
 
+      {/* Right Side - Login Form */}
       <div className="flex w-full md:w-1/2 bg-gradient-to-br from-purple-50 to-purple-100 items-center justify-center">
         <div className="bg-white shadow-2xl rounded-2xl p-10 w-[380px] transform transition duration-300 hover:scale-105">
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
@@ -74,7 +86,7 @@ export default function Login() {
           </h2>
 
           {error && (
-            <p className="text-red-500 text-center mb-4 text-sm">{error}</p>
+            <p className="text-red-500 text-center mb-4 text-sm bg-red-50 p-2 rounded border border-red-200">{error}</p>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -106,6 +118,17 @@ export default function Login() {
                 required
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
               />
+            </div>
+
+            {/* FORGOT PASSWORD LINK */}
+            <div className="flex justify-end">
+                <button 
+                    type="button" 
+                    onClick={handleForgotPassword}
+                    className="text-sm text-purple-600 hover:text-purple-800 hover:underline"
+                >
+                    Forgot Password?
+                </button>
             </div>
 
             <button
