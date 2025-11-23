@@ -40,7 +40,10 @@ app.use(express.json());
 //   credentials: true
 // }));
 app.use(cors({
-  origin: "*", // Allow Vercel to connect
+  origin: [
+    "http://localhost:5173", // Keep this for local testing
+    "https://mern-job-portal-ys-jgo1.vercel.app" // Add your Vercel domain
+  ],
   credentials: true
 }));
 // --- Database Connection ---
