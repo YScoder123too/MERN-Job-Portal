@@ -17,3 +17,5 @@ This archive contains two folders:
 3. npm run dev
 
 Client proxies `/api` to the server (see vite.config.js).
+
+Work
