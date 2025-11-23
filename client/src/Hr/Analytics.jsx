@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api"; // ✅ FIXED: Import central API
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line
@@ -7,8 +7,6 @@ import {
 import { Briefcase, Users, CheckCircle, Clock, Download, FileText } from "lucide-react";
 
 const Analytics = () => {
-  const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
-  
   const [stats, setStats] = useState({
     jobs: 0,
     applications: 0,
@@ -18,21 +16,13 @@ const Analytics = () => {
     courses: 0
   });
 
-  const getAuthConfig = () => {
-    let token = localStorage.getItem("token");
-    if (!token) {
-        const userInfo = localStorage.getItem("userInfo");
-        if (userInfo) token = JSON.parse(userInfo).token;
-    }
-    return { headers: { Authorization: `Bearer ${token}` }, withCredentials: true };
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // ✅ FIXED: Using api.get for both calls
         const [jobsRes, appsRes] = await Promise.all([
-          axios.get(`${BACKEND_URL}/api/jobs`, getAuthConfig()),
-          axios.get(`${BACKEND_URL}/api/applications/hr`, getAuthConfig())
+          api.get("/jobs"),
+          api.get("/applications/hr")
         ]);
 
         const myJobs = jobsRes.data.data || [];
@@ -56,7 +46,6 @@ const Analytics = () => {
     fetchData();
   }, []);
 
- 
   const handleExportCSV = () => {
     const csvContent = 
       `Metric,Count\n` +
@@ -75,11 +64,9 @@ const Analytics = () => {
     link.click();
   };
 
-  
   const handleExportPDF = () => {
     window.print();
   };
-
   
   const enrollmentData = [
     { name: 'Jan', value: 400 },
@@ -127,8 +114,6 @@ const Analytics = () => {
 
       {/* TOP CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        
-        {/* Total Applications */}
         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-indigo-500 print:border">
           <div className="flex justify-between items-center">
             <div>
@@ -139,7 +124,6 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Pending Review */}
         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-yellow-500 print:border">
           <div className="flex justify-between items-center">
             <div>
@@ -150,7 +134,6 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Jobs Posted */}
         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500 print:border">
           <div className="flex justify-between items-center">
             <div>
@@ -161,7 +144,6 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Acceptance Rate */}
         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-purple-500 print:border">
           <div className="flex justify-between items-center">
             <div>
@@ -177,8 +159,6 @@ const Analytics = () => {
 
       {/* CHARTS SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* HIRING FUNNEL */}
         <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border">
           <h3 className="text-xl font-bold text-gray-800 mb-6">Application Status</h3>
           <div className="h-72">
@@ -194,7 +174,6 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* ENROLLMENT TREND */}
         <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border">
           <h3 className="text-xl font-bold text-gray-800 mb-6">Course Enrollment Trend</h3>
           <div className="h-72">

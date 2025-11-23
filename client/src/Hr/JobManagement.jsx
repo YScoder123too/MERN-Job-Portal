@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Plus, Eye, Pencil, Trash2, X, Search, Mail, Users } from "lucide-react";
+import api from "../../services/api"; // ✅ FIXED: Import central API
+import { Plus, Users, Trash2, X, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const JobManagement = () => {
-  const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
   const navigate = useNavigate();
   
   const [jobs, setJobs] = useState([]);
@@ -14,18 +13,10 @@ const JobManagement = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const getAuthConfig = () => {
-    let token = localStorage.getItem("token");
-    if (!token) {
-        const userInfo = localStorage.getItem("userInfo");
-        if (userInfo) token = JSON.parse(userInfo).token;
-    }
-    return { headers: { Authorization: `Bearer ${token}` }, withCredentials: true };
-  };
-
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/jobs`, getAuthConfig());
+      // ✅ FIXED: Using api instance
+      const res = await api.get("/jobs");
       setJobs(Array.isArray(res.data) ? res.data : res.data.data || []);
     } catch (err) { console.error(err); } 
     finally { setIsLoading(false); }
@@ -48,7 +39,8 @@ const JobManagement = () => {
     };
 
     try {
-      await axios.post(`${BACKEND_URL}/api/jobs`, payload, getAuthConfig());
+      // ✅ FIXED: Using api instance
+      await api.post("/jobs", payload);
       setShowModal(false);
       fetchJobs(); 
     } catch (err) { alert("Failed to create job."); }
@@ -57,7 +49,8 @@ const JobManagement = () => {
   const handleDelete = async (id) => {
     if(!window.confirm("Delete this job?")) return;
     try {
-      await axios.delete(`${BACKEND_URL}/api/jobs/${id}`, getAuthConfig());
+      // ✅ FIXED: Using api instance
+      await api.delete(`/jobs/${id}`);
       setJobs(jobs.filter((j) => j._id !== id && j.id !== id));
     } catch (err) { alert("Failed to delete."); }
   };
@@ -110,7 +103,6 @@ const JobManagement = () => {
                    <div><label className="block text-sm font-medium mb-1">Type</label><select name="type" className="w-full border rounded p-2"><option>Full-time</option><option>Part-time</option><option>Contract</option></select></div>
                    <div><label className="block text-sm font-medium mb-1">Salary</label><input name="salary" className="w-full border rounded p-2" placeholder="$50k - $80k" /></div>
                 </div>
-                {/* NEW EMAIL FIELD */}
                 <div>
                     <label className="block text-sm font-medium mb-1 flex items-center gap-1"><Mail size={14}/> Contact Email (Visible to Candidates)</label>
                     <input name="hrEmail" type="email" className="w-full border rounded p-2" placeholder="hr@company.com" required />
