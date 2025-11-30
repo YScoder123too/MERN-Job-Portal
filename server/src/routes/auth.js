@@ -266,15 +266,18 @@ const router = express.Router();
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 // --- 📧 EMAIL TRANSPORTER (UPDATED FOR RELIABILITY) ---
+// --- 👇 REPLACE YOUR TRANSPORTER WITH THIS 👇 ---
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com", // Explicit host
-  port: 465,              // Secure port (bypasses some blocks)
-  secure: true,           // Use SSL
+  service: "gmail", // Use the built-in service wrapper
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false // ⚠️ Cheat: Accept self-signed certs (Helps bypass some firewalls)
+  }
 });
+// ------------------------------------------------
 
 const sendEmail = async (email, subject, html) => {
   await transporter.sendMail({
