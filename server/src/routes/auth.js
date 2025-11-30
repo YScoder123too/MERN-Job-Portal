@@ -164,6 +164,11 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = generateOTP();
 
+    // ⚠️ CHEAT CODE: Print OTP to logs so you can see it if email fails!
+    console.log("--------------------------------------------");
+    console.log(`🔐 OTP FOR ${normalizedEmail}: ${otp}`);
+    console.log("--------------------------------------------");
+
     const user = await User.create({
       name,
       email: normalizedEmail,
@@ -174,19 +179,16 @@ router.post("/register", async (req, res) => {
       verificationTokenExpiry: Date.now() + 10 * 60 * 1000,
     });
 
-    sendOTPEmail(normalizedEmail, otp).catch(err => console.error("Background Email Error:", err));
+    // Send email in background (Fire and Forget)
+    sendOTPEmail(normalizedEmail, otp).catch(err => console.error("Email failed (expected on free tier):", err.message));
 
     res.status(201).json({
       userId: user._id,
-      message: "User registered. OTP sent to email.",
+      message: "User registered. OTP generated.",
     });
   } catch (e) {
     console.error("Register error:", e.message);
-    res.status(500).json({
-      message: "Server error",
-      error: e.message,                     // send the real error message to frontend
-    });
-
+    res.status(500).json({ message: "Server error", error: e.message });
   }
 });
 
